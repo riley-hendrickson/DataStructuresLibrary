@@ -1,19 +1,18 @@
 import libraryProject.Library.*;
 import libraryProject.TestFunctions;
+
 public class Demonstration
 {
     public static void main(String[] args)
     {
-        BinaryTree tree = new BinaryTree();
-        HashMap map = new HashMap();
-        LinkedList list = new LinkedList();
-        Queue queue = new Queue();
-        Stack stack = new Stack();
+        MyPriorityQueue heap = new MyPriorityQueue();
+        MyHashMap map = new MyHashMap();
+        MyLinkedList list = new MyLinkedList();
+        MyStack stack = new MyStack();
 
-        TestFunctions.testBinaryTree(tree);
+        TestFunctions.testPriorityQueue(heap);
         TestFunctions.testHashMap(map);
         TestFunctions.testLinkedList(list);
-        TestFunctions.testQueue(queue);
         TestFunctions.testStack(stack);
     }
 }
