@@ -48,7 +48,6 @@ public class Library
         }
 
         // remove first
-        // remove last
         // remove at index
         // remove all
         // contains element
