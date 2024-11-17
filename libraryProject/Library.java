@@ -22,37 +22,48 @@ public class Library
     public static class MyLinkedList
     {
         Node head;
-        private int length;
+        public int length;
+
+        public MyLinkedList()
+        {
+            this.length = 0;
+        }
 
         public int size()
         {
             return this.length;
         }
 
-        public MyLinkedList add(MyLinkedList list, int value)
+        public boolean add(int value)
         {
-            if(list == null)
+            // if list is empty create a new node and initialize it as head pointer
+            if(this.head == null)
             {
                 Node newNode = new Node(value);
-                MyLinkedList newList = new MyLinkedList();
-                newList.head = newNode;
-                return newList;
+                this.head = newNode;
+                this.length++;
+                return true;
             }
 
-            return list;
+            // otherwise add to existing list
+            this.length++;
+            return true;
         }
 
-        public MyLinkedList clear(MyLinkedList list)
+        public boolean contains(int element)
         {
-            return list;
+            return true;
         }
 
-        // remove first
-        // remove at index
-        // remove all
-        // contains element
+        public int remove()
+        {
+            return 0;
+        }
 
-
+        public int remove(int location)
+        {
+            return location;
+        }
     }
     public static class MyHashMap
     {
