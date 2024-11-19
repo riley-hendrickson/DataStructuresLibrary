@@ -22,7 +22,8 @@ public class TestFunctions
         long endingTime;
         long avgOfRuntimes;
 
-        System.out.println("Testing Linked List...");
+        System.out.println("------------------------------------------------------------");
+        System.out.println("Testing Linked List...\n");
 
         LinkedList<Integer> javaList = new LinkedList<>();
         MyLinkedList myList = new MyLinkedList();
@@ -160,8 +161,7 @@ public class TestFunctions
         }
         avgOfRuntimes = sumOfRuntimes / TEST_FREQUENCY;
         System.out.println("Average runtime of deleting 100 times: " + avgOfRuntimes + "ms");
-
-        System.out.println();
+        System.out.println("------------------------------------------------------------\n");
     }
 
     public static void testHashMap(MyHashMap map)
@@ -171,7 +171,8 @@ public class TestFunctions
         long endingTime;
         long avgOfRuntimes;
 
-        System.out.println("Testing Hash Map...");
+        System.out.println("------------------------------------------------------------");
+        System.out.println("Testing Hash Map...\n");
 
         HashMap javaMap = new HashMap<Integer, Integer>();
         MyHashMap myHashMap = new MyHashMap();
@@ -256,6 +257,7 @@ public class TestFunctions
         }
         avgOfRuntimes = sumOfRuntimes / TEST_FREQUENCY;
         System.out.println("Average runtime of performing operation 100 times: " + avgOfRuntimes + "ms\n");
+        System.out.println("------------------------------------------------------------\n");
     }
 
 
@@ -266,7 +268,8 @@ public class TestFunctions
         long endingTime;
         long avgOfRuntimes;
 
-        System.out.println("Testing Priority Queue...");
+        System.out.println("------------------------------------------------------------");
+        System.out.println("Testing Priority Queue...\n");
 
         PriorityQueue javaPriorityQueue = new PriorityQueue<>();
         MyPriorityQueue myPriorityQueue = new MyPriorityQueue();
@@ -351,6 +354,7 @@ public class TestFunctions
         }
         avgOfRuntimes = sumOfRuntimes / TEST_FREQUENCY;
         System.out.println("Average runtime of performing operation 100 times: " + avgOfRuntimes + "ms\n");
+        System.out.println("------------------------------------------------------------\n");
     }
 
     public static void testStack(MyStack stack)
@@ -360,7 +364,8 @@ public class TestFunctions
         long endingTime;
         long avgOfRuntimes;
 
-        System.out.println("Testing Stack...");
+        System.out.println("------------------------------------------------------------");
+        System.out.println("Testing Stack...\n");
 
         Stack javaStack = new Stack<>();
         MyStack myStack = new MyStack();
@@ -445,5 +450,6 @@ public class TestFunctions
         }
         avgOfRuntimes = sumOfRuntimes / TEST_FREQUENCY;
         System.out.println("Average runtime of performing operation 100 times: " + avgOfRuntimes + "ms\n");
+        System.out.println("------------------------------------------------------------");
     }
 }
