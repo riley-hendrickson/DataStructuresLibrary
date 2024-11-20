@@ -22,6 +22,7 @@ public class Library
     public static class MyLinkedList
     {
         Node head;
+        Node tail;
         public int length;
 
         public MyLinkedList()
@@ -36,23 +37,31 @@ public class Library
 
         public boolean add(int value)
         {
-            // if list is empty create a new node and initialize it as head pointer
+            Node newNode = new Node(value);
+            // if list is empty initialize new node as head pointer
             if(this.head == null)
             {
-                Node newNode = new Node(value);
                 this.head = newNode;
+                this.tail = newNode;
                 this.length++;
                 return true;
             }
-
             // otherwise add to existing list
+            this.tail.next = newNode;
+            this.tail = newNode;
             this.length++;
             return true;
         }
 
         public boolean contains(int element)
         {
-            return true;
+            Node crawler = this.head;
+            for(int i = 0; i < this.length; i++)
+            {
+                if(crawler.val == element) return true;
+                crawler = crawler.next;
+            }
+            return false;
         }
 
         public int remove()
