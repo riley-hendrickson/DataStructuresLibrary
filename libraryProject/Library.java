@@ -3,20 +3,20 @@ package libraryProject;
 public class Library
 {
     // helper class to be used in Linked List and Binary Tree implementations:
-    public static class Node
+    private static class Node
     {
-        int val;
-        Node next;
+        private int val;
+        public Node next;
 
         public Node(int val)
         {
             this.val = val;
         }
-        public Node(int val, Node next)
-        {
-            this.val = val;
-            this.next = next;
-        }
+        // public Node(int val, Node next)
+        // {
+        //     this.val = val;
+        //     this.next = next;
+        // }
     }
 
     public static class MyLinkedList
