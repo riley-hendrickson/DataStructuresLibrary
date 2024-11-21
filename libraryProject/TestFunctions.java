@@ -11,11 +11,12 @@ import java.util.Random;
 
 public class TestFunctions
 {
-    private static final int TEST_FREQUENCY = 3;
+    private static final int TEST_FREQUENCY = 5;
+    private static final int NUM_OPERATIONS = 1000;
 
     private static Random randomNumberGenerator = new Random();
 
-    public static void testLinkedList(MyLinkedList list)
+    public static void testLinkedList(MyLinkedList<Integer> list)
     {
         long sumOfRuntimes = 0;
         long startingTime;
@@ -26,14 +27,24 @@ public class TestFunctions
         System.out.println("Testing Linked List...\n");
 
         LinkedList<Integer> javaList = new LinkedList<>();
-        MyLinkedList myList = new MyLinkedList();
+        MyLinkedList<Integer> myList = new MyLinkedList<>();
+
+        // warm up phase before measuring runtime to avoid JVM initialization overhead, and to ensure we don't need to refill lists after testing remove function
+        for(int j = 0; j < TEST_FREQUENCY; j++)
+        {
+            for(int i = 0; i < NUM_OPERATIONS; i++)
+            {
+                javaList.add(i);
+                myList.add(i);
+            }
+        }
 
         // measuring runtime for java's linked list operations:
         System.out.println("Java.util's linked list results:");
         for(int j = 0; j < TEST_FREQUENCY; j++)
         {
             startingTime = System.nanoTime();
-            for(int i = 0; i < 100; i++)
+            for(int i = 0; i < NUM_OPERATIONS; i++)
             {
                 javaList.add(i);
             }
@@ -41,13 +52,13 @@ public class TestFunctions
             sumOfRuntimes += endingTime - startingTime;
         }
         avgOfRuntimes = sumOfRuntimes / TEST_FREQUENCY;
-        System.out.println("Average runtime of inserting 100 times: " + avgOfRuntimes + "ms");
+        System.out.println("Average runtime of inserting NUM_OPERATIONS times: " + avgOfRuntimes + "ms");
 
         sumOfRuntimes = 0;
         for(int j = 0; j < TEST_FREQUENCY; j++)
         {
             startingTime = System.nanoTime();
-            for(int i = 0; i < 100; i++)
+            for(int i = 0; i < NUM_OPERATIONS; i++)
             {
                 javaList.contains(i);
             }
@@ -55,52 +66,42 @@ public class TestFunctions
             sumOfRuntimes += endingTime - startingTime;
         }
         avgOfRuntimes = sumOfRuntimes / TEST_FREQUENCY;
-        System.out.println("Average runtime of 100 lookup operations: " + avgOfRuntimes + "ms");
+        System.out.println("Average runtime of NUM_OPERATIONS lookup operations: " + avgOfRuntimes + "ms");
 
         sumOfRuntimes = 0;
         for(int j = 0; j < TEST_FREQUENCY; j++)
         {
             startingTime = System.nanoTime();
-            for(int i = 0; i < 100; i++)
+            for(int i = 0; i < NUM_OPERATIONS; i++)
             {
                 javaList.remove(randomNumberGenerator.nextInt(javaList.size()));
             }
             endingTime = System.nanoTime();
-            sumOfRuntimes = endingTime - startingTime;
-            // refill java list:
-            for(int i = 0; i < 100; i++)
-            {
-                javaList.add(i);
-            }
+            sumOfRuntimes += endingTime - startingTime;
         }
         avgOfRuntimes = sumOfRuntimes / TEST_FREQUENCY;
-        System.out.println("Average of deleting at random location 100 times: " + avgOfRuntimes + "ms");
+        System.out.println("Average of deleting at random location NUM_OPERATIONS times: " + avgOfRuntimes + "ms");
 
         sumOfRuntimes = 0;
         for(int j = 0; j < TEST_FREQUENCY; j++)
         {
             startingTime = System.nanoTime();
-            for(int i = 0; i < 100; i++)
+            for(int i = 0; i < NUM_OPERATIONS; i++)
             {
                 javaList.remove();
             }
             endingTime = System.nanoTime();
             sumOfRuntimes += endingTime - startingTime;
-            // refill java list:
-            for(int i = 0; i < 100; i++)
-            {
-                javaList.add(i);
-            }
         }
         avgOfRuntimes = sumOfRuntimes / TEST_FREQUENCY;
-        System.out.println("Average runtime of deleting 100 times: " + avgOfRuntimes + "ms\n");
+        System.out.println("Average runtime of deleting NUM_OPERATIONS times: " + avgOfRuntimes + "ms\n");
 
         // measuring runtime for my linked list's operations:
         System.out.println("My linked list results:");
         for(int j = 0; j < TEST_FREQUENCY; j++)
         {
             startingTime = System.nanoTime();
-            for(int i = 0; i < 100; i++)
+            for(int i = 0; i < NUM_OPERATIONS; i++)
             {
                 myList.add(i);
             }
@@ -108,13 +109,13 @@ public class TestFunctions
             sumOfRuntimes += endingTime - startingTime;
         }
         avgOfRuntimes = sumOfRuntimes / TEST_FREQUENCY;
-        System.out.println("Average runtime of inserting 100 times: " + avgOfRuntimes + "ms");
+        System.out.println("Average runtime of inserting NUM_OPERATIONS times: " + avgOfRuntimes + "ms");
         
         sumOfRuntimes = 0;
         for(int j = 0; j < TEST_FREQUENCY; j++)
         {
             startingTime = System.nanoTime();
-            for(int i = 0; i < 100; i++)
+            for(int i = 0; i < NUM_OPERATIONS; i++)
             {
                 myList.contains(i);
             }
@@ -122,49 +123,39 @@ public class TestFunctions
             sumOfRuntimes += endingTime - startingTime;
         }
         avgOfRuntimes = sumOfRuntimes / TEST_FREQUENCY;
-        System.out.println("Average runtime of 100 lookup operations: " + avgOfRuntimes + "ms");
+        System.out.println("Average runtime of NUM_OPERATIONS lookup operations: " + avgOfRuntimes + "ms");
         
         sumOfRuntimes = 0;
         for(int j = 0; j < TEST_FREQUENCY; j++)
         {
             startingTime = System.nanoTime();
-            for(int i = 0; i < 100; i++)
+            for(int i = 0; i < NUM_OPERATIONS; i++)
             {
-                myList.remove(randomNumberGenerator.nextInt(myList.length));
+                myList.remove(randomNumberGenerator.nextInt(myList.size()));
             }
             endingTime = System.nanoTime();
-            sumOfRuntimes = endingTime - startingTime;
-            // refill list:
-            for(int i = 0; i < 100; i++)
-            {
-                myList.add(i);
-            }
+            sumOfRuntimes += endingTime - startingTime;
         }
         avgOfRuntimes = sumOfRuntimes / TEST_FREQUENCY;
-        System.out.println("Average of deleting at random location 100 times: " + avgOfRuntimes + "ms");
+        System.out.println("Average of deleting at random location NUM_OPERATIONS times: " + avgOfRuntimes + "ms");
         
         sumOfRuntimes = 0;
         for(int j = 0; j < TEST_FREQUENCY; j++)
         {
             startingTime = System.nanoTime();
-            for(int i = 0; i < 100; i++)
+            for(int i = 0; i < NUM_OPERATIONS; i++)
             {
                 myList.remove();
             }
             endingTime = System.nanoTime();
             sumOfRuntimes += endingTime - startingTime;
-            // refill list:
-            for(int i = 0; i < 100; i++)
-            {
-                myList.add(i);
-            }
         }
         avgOfRuntimes = sumOfRuntimes / TEST_FREQUENCY;
-        System.out.println("Average runtime of deleting 100 times: " + avgOfRuntimes + "ms");
+        System.out.println("Average runtime of deleting NUM_OPERATIONS times: " + avgOfRuntimes + "ms");
         System.out.println("------------------------------------------------------------\n");
     }
 
-    public static void testHashMap(MyHashMap map)
+    public static void testHashMap(MyHashMap<Integer, Integer> map)
     {
         long sumOfRuntimes = 0;
         long startingTime;
@@ -174,94 +165,104 @@ public class TestFunctions
         System.out.println("------------------------------------------------------------");
         System.out.println("Testing Hash Map...\n");
 
-        HashMap javaMap = new HashMap<Integer, Integer>();
-        MyHashMap myHashMap = new MyHashMap();
+        HashMap <Integer, Integer> javaMap = new HashMap<Integer, Integer>();
+        MyHashMap<Integer, Integer> myHashMap = new MyHashMap<>();
+
+        // warm up phase before measuring runtime to avoid JVM initialization overhead, and to ensure we don't need to refill lists after testing remove function
+        for(int j = 0; j < TEST_FREQUENCY; j++)
+        {
+            for(int i = 0; i < NUM_OPERATIONS; i++)
+            {
+                javaMap.put(i, i);
+                myHashMap.put(i, i);
+            }
+        }        
 
         // measuring runtime for java's hash map operations:
         System.out.println("Java.util's hash map results:");
         for(int j = 0; j < TEST_FREQUENCY; j++)
         {
             startingTime = System.nanoTime();
-            for(int i = 0; i < 100; i++)
+            for(int i = 0; i < NUM_OPERATIONS; i++)
             {
-                // get operation
+                javaMap.put(i, i);
             }
             endingTime = System.nanoTime();
             sumOfRuntimes += endingTime - startingTime;
         }
         avgOfRuntimes = sumOfRuntimes / TEST_FREQUENCY;
-        System.out.println("Average runtime of performing operation 100 times: " + avgOfRuntimes + "ms");
+        System.out.println("Average runtime of performing put operation NUM_OPERATIONS times: " + avgOfRuntimes + "ms");
         
         for(int j = 0; j < TEST_FREQUENCY; j++)
         {
             startingTime = System.nanoTime();
-            for(int i = 0; i < 100; i++)
+            for(int i = 0; i < NUM_OPERATIONS; i++)
             {
-                // put operation
+                javaMap.get(i);
             }
             endingTime = System.nanoTime();
             sumOfRuntimes += endingTime - startingTime;
         }
         avgOfRuntimes = sumOfRuntimes / TEST_FREQUENCY;
-        System.out.println("Average runtime of performing operation 100 times: " + avgOfRuntimes + "ms");
+        System.out.println("Average runtime of performing get operation NUM_OPERATIONS times: " + avgOfRuntimes + "ms");
 
         for(int j = 0; j < TEST_FREQUENCY; j++)
         {
             startingTime = System.nanoTime();
-            for(int i = 0; i < 100; i++)
+            for(int i = 0; i < NUM_OPERATIONS; i++)
             {
-                // remove operation
+                javaMap.remove(i);
             }
             endingTime = System.nanoTime();
             sumOfRuntimes += endingTime - startingTime;
         }
         avgOfRuntimes = sumOfRuntimes / TEST_FREQUENCY;
-        System.out.println("Average runtime of performing operation 100 times: " + avgOfRuntimes + "ms\n");
+        System.out.println("Average runtime of performing remove operation NUM_OPERATIONS times: " + avgOfRuntimes + "ms\n");
 
         System.out.println("My hash map results:");
         for(int j = 0; j < TEST_FREQUENCY; j++)
         {
             startingTime = System.nanoTime();
-            for(int i = 0; i < 100; i++)
+            for(int i = 0; i < NUM_OPERATIONS; i++)
             {
-                // get operation
+                myHashMap.put(i, i);
             }
             endingTime = System.nanoTime();
             sumOfRuntimes += endingTime - startingTime;
         }
         avgOfRuntimes = sumOfRuntimes / TEST_FREQUENCY;
-        System.out.println("Average runtime of performing operation 100 times: " + avgOfRuntimes + "ms");
+        System.out.println("Average runtime of performing put operation NUM_OPERATIONS times: " + avgOfRuntimes + "ms");
         
         for(int j = 0; j < TEST_FREQUENCY; j++)
         {
             startingTime = System.nanoTime();
-            for(int i = 0; i < 100; i++)
+            for(int i = 0; i < NUM_OPERATIONS; i++)
             {
-                // put operation
+                myHashMap.get(i);
             }
             endingTime = System.nanoTime();
             sumOfRuntimes += endingTime - startingTime;
         }
         avgOfRuntimes = sumOfRuntimes / TEST_FREQUENCY;
-        System.out.println("Average runtime of performing operation 100 times: " + avgOfRuntimes + "ms");
+        System.out.println("Average runtime of performing get operation NUM_OPERATIONS times: " + avgOfRuntimes + "ms");
 
         for(int j = 0; j < TEST_FREQUENCY; j++)
         {
             startingTime = System.nanoTime();
-            for(int i = 0; i < 100; i++)
+            for(int i = 0; i < NUM_OPERATIONS; i++)
             {
-                // remove operation
+                myHashMap.remove(i);
             }
             endingTime = System.nanoTime();
             sumOfRuntimes += endingTime - startingTime;
         }
         avgOfRuntimes = sumOfRuntimes / TEST_FREQUENCY;
-        System.out.println("Average runtime of performing operation 100 times: " + avgOfRuntimes + "ms\n");
+        System.out.println("Average runtime of performing remove operation NUM_OPERATIONS times: " + avgOfRuntimes + "ms\n");
         System.out.println("------------------------------------------------------------\n");
     }
 
 
-    public static void testPriorityQueue(MyPriorityQueue heap)
+    public static void testPriorityQueue(MyPriorityQueue<Integer> heap)
     {
         long sumOfRuntimes = 0;
         long startingTime;
@@ -271,93 +272,94 @@ public class TestFunctions
         System.out.println("------------------------------------------------------------");
         System.out.println("Testing Priority Queue...\n");
 
-        PriorityQueue javaPriorityQueue = new PriorityQueue<>();
-        MyPriorityQueue myPriorityQueue = new MyPriorityQueue();
+        PriorityQueue <Integer> javaPriorityQueue = new PriorityQueue<Integer>();
+        MyPriorityQueue <Integer> myPriorityQueue = new MyPriorityQueue<>();
 
         // measuring runtime for java's priority queue operations:
         System.out.println("Java.util's priority queue results:");
         for(int j = 0; j < TEST_FREQUENCY; j++)
         {
             startingTime = System.nanoTime();
-            for(int i = 0; i < 100; i++)
+            for(int i = 0; i < NUM_OPERATIONS; i++)
             {
                 // add operation
+                javaPriorityQueue.add(i);
             }
             endingTime = System.nanoTime();
             sumOfRuntimes += endingTime - startingTime;
         }
         avgOfRuntimes = sumOfRuntimes / TEST_FREQUENCY;
-        System.out.println("Average runtime of performing operation 100 times: " + avgOfRuntimes + "ms");
+        System.out.println("Average runtime of performing add operation NUM_OPERATIONS times: " + avgOfRuntimes + "ms");
         
         for(int j = 0; j < TEST_FREQUENCY; j++)
         {
             startingTime = System.nanoTime();
-            for(int i = 0; i < 100; i++)
+            for(int i = 0; i < NUM_OPERATIONS; i++)
             {
-                // contains operation
+                javaPriorityQueue.peek();
             }
             endingTime = System.nanoTime();
             sumOfRuntimes += endingTime - startingTime;
         }
         avgOfRuntimes = sumOfRuntimes / TEST_FREQUENCY;
-        System.out.println("Average runtime of performing operation 100 times: " + avgOfRuntimes + "ms");
+        System.out.println("Average runtime of performing peek operation NUM_OPERATIONS times: " + avgOfRuntimes + "ms");
 
         for(int j = 0; j < TEST_FREQUENCY; j++)
         {
             startingTime = System.nanoTime();
-            for(int i = 0; i < 100; i++)
+            for(int i = 0; i < NUM_OPERATIONS; i++)
             {
-                // remove operation
+                javaPriorityQueue.poll();
             }
             endingTime = System.nanoTime();
             sumOfRuntimes += endingTime - startingTime;
         }
         avgOfRuntimes = sumOfRuntimes / TEST_FREQUENCY;
-        System.out.println("Average runtime of performing operation 100 times: " + avgOfRuntimes + "ms\n");
+        System.out.println("Average runtime of performing poll operation NUM_OPERATIONS times: " + avgOfRuntimes + "ms\n");
 
         System.out.println("My priority queue results:");
         for(int j = 0; j < TEST_FREQUENCY; j++)
         {
             startingTime = System.nanoTime();
-            for(int i = 0; i < 100; i++)
+            for(int i = 0; i < NUM_OPERATIONS; i++)
             {
-                // add operation
+                myPriorityQueue.add(i);
             }
             endingTime = System.nanoTime();
             sumOfRuntimes += endingTime - startingTime;
         }
         avgOfRuntimes = sumOfRuntimes / TEST_FREQUENCY;
-        System.out.println("Average runtime of performing operation 100 times: " + avgOfRuntimes + "ms");
+        System.out.println("Average runtime of performing add operation NUM_OPERATIONS times: " + avgOfRuntimes + "ms");
         
         for(int j = 0; j < TEST_FREQUENCY; j++)
         {
             startingTime = System.nanoTime();
-            for(int i = 0; i < 100; i++)
+            for(int i = 0; i < NUM_OPERATIONS; i++)
             {
-                // contains operation
+                myPriorityQueue.peek();
             }
             endingTime = System.nanoTime();
             sumOfRuntimes += endingTime - startingTime;
         }
         avgOfRuntimes = sumOfRuntimes / TEST_FREQUENCY;
-        System.out.println("Average runtime of performing operation 100 times: " + avgOfRuntimes + "ms");
+        System.out.println("Average runtime of performing peek operation NUM_OPERATIONS times: " + avgOfRuntimes + "ms");
 
         for(int j = 0; j < TEST_FREQUENCY; j++)
         {
             startingTime = System.nanoTime();
-            for(int i = 0; i < 100; i++)
+            for(int i = 0; i < NUM_OPERATIONS; i++)
             {
-                // remove operation
+                myPriorityQueue.poll();
             }
             endingTime = System.nanoTime();
             sumOfRuntimes += endingTime - startingTime;
         }
         avgOfRuntimes = sumOfRuntimes / TEST_FREQUENCY;
-        System.out.println("Average runtime of performing operation 100 times: " + avgOfRuntimes + "ms\n");
+        System.out.println("Average runtime of performing poll operation NUM_OPERATIONS times: " + avgOfRuntimes + "ms\n");
         System.out.println("------------------------------------------------------------\n");
     }
 
-    public static void testStack(MyStack stack)
+    public static void testStack(MyStack<Integer> stack)
     {
         long sumOfRuntimes = 0;
         long startingTime;
@@ -367,89 +369,89 @@ public class TestFunctions
         System.out.println("------------------------------------------------------------");
         System.out.println("Testing Stack...\n");
 
-        Stack javaStack = new Stack<>();
-        MyStack myStack = new MyStack();
+        Stack <Integer> javaStack = new Stack<>();
+        MyStack <Integer>myStack = new MyStack<>();
 
         // measuring runtime for java's hash map operations:
         System.out.println("Java.util's stack results:");
         for(int j = 0; j < TEST_FREQUENCY; j++)
         {
             startingTime = System.nanoTime();
-            for(int i = 0; i < 100; i++)
+            for(int i = 0; i < NUM_OPERATIONS; i++)
             {
-                // push operation
+                javaStack.push(i);
             }
             endingTime = System.nanoTime();
             sumOfRuntimes += endingTime - startingTime;
         }
         avgOfRuntimes = sumOfRuntimes / TEST_FREQUENCY;
-        System.out.println("Average runtime of performing operation 100 times: " + avgOfRuntimes + "ms");
+        System.out.println("Average runtime of performing push operation NUM_OPERATIONS times: " + avgOfRuntimes + "ms");
         
         for(int j = 0; j < TEST_FREQUENCY; j++)
         {
             startingTime = System.nanoTime();
-            for(int i = 0; i < 100; i++)
+            for(int i = 0; i < NUM_OPERATIONS; i++)
             {
-                // contains operation
+                javaStack.peek();
             }
             endingTime = System.nanoTime();
             sumOfRuntimes += endingTime - startingTime;
         }
         avgOfRuntimes = sumOfRuntimes / TEST_FREQUENCY;
-        System.out.println("Average runtime of performing operation 100 times: " + avgOfRuntimes + "ms");
+        System.out.println("Average runtime of performing peek operation NUM_OPERATIONS times: " + avgOfRuntimes + "ms");
 
         for(int j = 0; j < TEST_FREQUENCY; j++)
         {
             startingTime = System.nanoTime();
-            for(int i = 0; i < 100; i++)
+            for(int i = 0; i < NUM_OPERATIONS; i++)
             {
-                // pop operation
+                javaStack.pop();
             }
             endingTime = System.nanoTime();
             sumOfRuntimes += endingTime - startingTime;
         }
         avgOfRuntimes = sumOfRuntimes / TEST_FREQUENCY;
-        System.out.println("Average runtime of performing operation 100 times: " + avgOfRuntimes + "ms\n");
+        System.out.println("Average runtime of performing pop operation NUM_OPERATIONS times: " + avgOfRuntimes + "ms\n");
 
         System.out.println("My stack results:");
         for(int j = 0; j < TEST_FREQUENCY; j++)
         {
             startingTime = System.nanoTime();
-            for(int i = 0; i < 100; i++)
+            for(int i = 0; i < NUM_OPERATIONS; i++)
             {
-                // push operation
+                myStack.push(i);
             }
             endingTime = System.nanoTime();
             sumOfRuntimes += endingTime - startingTime;
         }
         avgOfRuntimes = sumOfRuntimes / TEST_FREQUENCY;
-        System.out.println("Average runtime of performing operation 100 times: " + avgOfRuntimes + "ms");
+        System.out.println("Average runtime of performing push operation NUM_OPERATIONS times: " + avgOfRuntimes + "ms");
         
         for(int j = 0; j < TEST_FREQUENCY; j++)
         {
             startingTime = System.nanoTime();
-            for(int i = 0; i < 100; i++)
+            for(int i = 0; i < NUM_OPERATIONS; i++)
             {
-                // contains operation
+                myStack.peek();
             }
             endingTime = System.nanoTime();
             sumOfRuntimes += endingTime - startingTime;
         }
         avgOfRuntimes = sumOfRuntimes / TEST_FREQUENCY;
-        System.out.println("Average runtime of performing operation 100 times: " + avgOfRuntimes + "ms");
+        System.out.println("Average runtime of performing peek operation NUM_OPERATIONS times: " + avgOfRuntimes + "ms");
 
         for(int j = 0; j < TEST_FREQUENCY; j++)
         {
             startingTime = System.nanoTime();
-            for(int i = 0; i < 100; i++)
+            for(int i = 0; i < NUM_OPERATIONS; i++)
             {
-                // pop operation
+                myStack.pop();
             }
             endingTime = System.nanoTime();
             sumOfRuntimes += endingTime - startingTime;
         }
         avgOfRuntimes = sumOfRuntimes / TEST_FREQUENCY;
-        System.out.println("Average runtime of performing operation 100 times: " + avgOfRuntimes + "ms\n");
+        System.out.println("Average runtime of performing pop operation NUM_OPERATIONS times: " + avgOfRuntimes + "ms\n");
         System.out.println("------------------------------------------------------------");
     }
 }

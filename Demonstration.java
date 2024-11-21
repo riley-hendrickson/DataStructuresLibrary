@@ -5,14 +5,14 @@ public class Demonstration
 {
     public static void main(String[] args)
     {
-        MyPriorityQueue heap = new MyPriorityQueue();
-        MyHashMap map = new MyHashMap();
-        MyLinkedList list = new MyLinkedList();
-        MyStack stack = new MyStack();
+        MyLinkedList <Integer> list = new MyLinkedList<>();
+        MyHashMap <Integer, Integer> map = new MyHashMap<>();
+        MyPriorityQueue <Integer> heap = new MyPriorityQueue<>();
+        MyStack <Integer> stack = new MyStack<>();
 
-        TestFunctions.testPriorityQueue(heap);
-        TestFunctions.testHashMap(map);
         TestFunctions.testLinkedList(list);
+        TestFunctions.testHashMap(map);
+        TestFunctions.testPriorityQueue(heap);
         TestFunctions.testStack(stack);
     }
 }
