@@ -96,6 +96,7 @@ public class Library
             }
             T temp = crawler.next.val;
             crawler.next = crawler.next.next;
+            this.length--;
 
             return temp;
         }
