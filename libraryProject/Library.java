@@ -74,13 +74,30 @@ public class Library
 
         public T remove()
         {
-            return this.head.val;
+            if(this.length == 0) throw new IllegalStateException("Cannot remove while list is empty");
+            if(this.length == 1) this.tail = null;
+
+            T value = head.val;
+            this.head = head.next;
+            length--;
+
+            return value;
         }
 
         public T remove(int location)
         {
+            if(this.length == 0) throw new IllegalStateException("Cannot remove while list is empty");
+            if(location >= this.length) throw new IndexOutOfBoundsException("Removal index is out of bounds");
 
-            return this.head.val;
+            Node<T> crawler = this.head;
+            for(int i = 0; i < location-1; i++)
+            {
+                crawler = crawler.next;
+            }
+            T temp = crawler.next.val;
+            crawler.next = crawler.next.next;
+
+            return temp;
         }
     }
     public static class MyHashMap<K, V>
