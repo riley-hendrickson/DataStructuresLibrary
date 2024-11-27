@@ -103,6 +103,7 @@ public class Library
     }
     public static class MyHashMap<K, V>
     {
+        private static final int DEFAULT_CAPACITY = 16;
         // helper class to be used in HashMap
         private static class Entry<K, V>
         {
@@ -117,6 +118,12 @@ public class Library
             }
         }
         private Entry<K, V> [] entries;
+
+        @SuppressWarnings("unchecked")
+        public MyHashMap()
+        {
+            entries = (Entry<K, V> []) new Entry[DEFAULT_CAPACITY];
+        }
 
         public boolean put(K key, V value)
         {
@@ -145,7 +152,7 @@ public class Library
 
         public void add(T value)
         {
-
+            heap.add(value);
         }
 
         public T peek()
