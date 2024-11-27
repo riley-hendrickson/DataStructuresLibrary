@@ -167,26 +167,49 @@ public class Library
     }
     public static class MyStack<T>
     {
-        private List<T> stack;
+        private Node<T> top;
+        private int size;
 
         public MyStack()
         {
-            stack = new ArrayList<>();
+            this.size = 0;
         }
 
         public void push(T value)
         {
-            stack.add(value);
+            Node<T> newNode = new Node<T>(value);
+            if(size != 0)
+            {
+                newNode.next = this.top;
+            }
+            this.top = newNode;
+            size++;
         }
 
         public T pop()
         {
-            return stack.get(0);
+            if(size == 0) throw new IllegalStateException("Cannot remove from the stack while it is empty!");
+
+            T returnVal = this.top.val;
+            this.top = this.top.next;
+            size--;
+            return returnVal;
         }
 
         public T peek()
         {
-            return stack.get(stack.size()-1);
+            if(size == 0) throw new IllegalStateException("Cannot peek while the stack is empty!");
+            return top.val;
+        }
+
+        public boolean isEmpty()
+        {
+            return this.size == 0? true : false; 
+        }
+
+        public int size()
+        {
+            return this.size;
         }
     }
 }
