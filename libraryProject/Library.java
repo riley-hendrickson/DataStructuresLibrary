@@ -4,7 +4,7 @@ import java.util.List;
 import java.util.ArrayList;
 public class Library
 {
-    // helper class to be used in Linked List and Binary Tree implementations:
+    // helper class to be used in Linked List implementation:
     private static class Node <T>
     {
         private T val;
@@ -55,7 +55,6 @@ public class Library
             return true;
         }
 
-        // optimize this later on
         public boolean contains(T element)
         {
             Node<T> crawler = this.head;
@@ -98,9 +97,8 @@ public class Library
     }
     public static class MyHashMap<K, V>
     {
-        private static final int DEFAULT_CAPACITY = 16;
         // helper class to be used in HashMap
-        private static class Entry<K, V>
+        private class Entry<K, V>
         {
             private final K key;
             private V value;
@@ -111,29 +109,102 @@ public class Library
                 this.key = key;
                 this.value = value;
             }
+            public K getKey()
+            {
+                return this.key;
+            }
+            public V getValue()
+            {
+                return this.value;
+            }
+            public void setValue(V value)
+            {
+                this.value = value;
+            }
         }
-        private Entry<K, V> [] entries;
+        private final int DEFAULT_CAPACITY = 16;
+        private Entry<K, V> entries[];
 
         @SuppressWarnings("unchecked")
         public MyHashMap()
         {
-            entries = (Entry<K, V> []) new Entry[DEFAULT_CAPACITY];
+            this.entries = new Entry[DEFAULT_CAPACITY];
         }
 
-        public boolean put(K key, V value)
+        public void put(K key, V value)
         {
-            Entry<K,V> newEntry = new Entry<K, V>(key, value);
-            return true;
+            int hashcode = key.hashCode() % DEFAULT_CAPACITY;
+            Entry<K, V> newEntry = entries[hashcode];
+
+            if(newEntry == null)
+            {
+                entries[hashcode] = new Entry<K, V>(key, value);
+                newEntry = entries[hashcode];
+            }
+            else
+            {
+                while (newEntry.next != null)
+                {
+                    if(newEntry.key.equals(key))
+                    {
+                        newEntry.value = value;
+                        return;
+                    }
+                    newEntry = newEntry.next;
+                }
+                if(newEntry.key.equals(key))
+                {
+                    newEntry.value = value;
+                    return;
+                }
+            }
+
+            newEntry.next = new Entry<K, V>(key, value);
         }
 
-        public Entry<K, V> get(K key)
+        public V get(K key)
         {
-            return entries[0];
+            int hashcode = key.hashCode() % DEFAULT_CAPACITY;
+            Entry<K, V> newEntry = entries[hashcode];
+
+            if(newEntry == null) return null;
+
+            while(newEntry != null)
+            {
+                if(newEntry.getKey().equals(key)) return newEntry.value;
+                else newEntry = newEntry.next;
+            }
+            return null;
         }
 
-        public boolean remove(K key)
+        public Entry<K, V> remove(K key)
         {
-            return true;
+            int hashcode = key.hashCode() % DEFAULT_CAPACITY;
+            Entry<K, V> newEntry = entries[hashcode];
+
+            if(newEntry == null) return null;
+            
+            if(newEntry.getKey().equals(key))
+            {
+                entries[hashcode] = newEntry.next;
+                newEntry.next = null;
+                return newEntry;
+            }
+
+            Entry<K, V> previous = newEntry;
+            newEntry = newEntry.next;
+            while(newEntry != null)
+            {
+                if(newEntry.getKey().equals(key))
+                {
+                    previous.next = newEntry.next;
+                    newEntry.next = null;
+                    return newEntry;
+                }
+                previous = previous.next;
+                newEntry = newEntry.next;
+            }
+            return null;
         }
     }
     public static class MyPriorityQueue<T>

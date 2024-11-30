@@ -166,7 +166,7 @@ public class TestFunctions
         System.out.println("Testing Hash Map...\n");
 
         HashMap <Integer, Integer> javaMap = new HashMap<Integer, Integer>();
-        MyHashMap<Integer, Integer> myHashMap = new MyHashMap<>();
+        MyHashMap<Integer, Integer> myHashMap = new MyHashMap<Integer, Integer>();
 
         // warm up phase before measuring runtime to avoid JVM initialization overhead, and to ensure we don't need to refill lists after testing remove function
         for(int j = 0; j < TEST_FREQUENCY; j++)
