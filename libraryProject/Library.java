@@ -2,6 +2,7 @@ package libraryProject;
 
 import java.util.List;
 import java.util.ArrayList;
+import java.util.Comparator;
 public class Library
 {
     // helper class to be used in Linked List implementation:
@@ -98,7 +99,7 @@ public class Library
     public static class MyHashMap<K, V>
     {
         // helper class to be used in HashMap
-        private class Entry<K, V>
+        private class Entry<EK, EV>
         {
             private final K key;
             private V value;
@@ -209,26 +210,78 @@ public class Library
     }
     public static class MyPriorityQueue<T>
     {
-        private List<T> heap;
+        private ArrayList<T> heap;
+        private Comparator<? super T> comparator;
 
-        public MyPriorityQueue()
+        public MyPriorityQueue(Comparator<? super T> comparator) 
         {
-            heap = new ArrayList<>();
+            this.heap = new ArrayList<>();
+            this.comparator = comparator;
+        }
+    
+        public MyPriorityQueue() 
+        {
+            this(null); // Natural ordering if no comparator is provided
+        }
+
+        private int getParent(int index) 
+        {
+            return (index - 1) / 2;
+        }
+        
+        private int getLeftChild(int index) 
+        {
+            return (2 * index) + 1;
+        }
+        
+        private int getRightChild(int index) 
+        {
+            return (2 * index) + 2;
+        }
+
+        private void heapifyUp(int index)
+        {
+
+        }
+
+        private void heapifyDown(int index)
+        {
+
+        }
+
+        private void swap(int a, int b)
+        {
+            T temp = heap.get(a);
+            heap.set(a, heap.get(b));
+            heap.set(b, temp);
         }
 
         public void add(T value)
         {
             heap.add(value);
+            heapifyUp(heap.size()-1);
         }
 
         public T peek()
         {
+            if(heap.size() == 0) throw new IllegalStateException("Cannot peek while the heap is empty!");
+
             return heap.get(0);
         }
 
         public T poll()
         {
             return heap.get(0);
+        }
+
+        public int size()
+        {
+            return heap.size();
+        }
+
+        public boolean isEmpty()
+        {
+            return heap.size() == 0;
         }
     }
     public static class MyStack<T>
