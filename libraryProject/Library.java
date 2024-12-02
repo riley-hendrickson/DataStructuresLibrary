@@ -221,7 +221,20 @@ public class Library
     
         public MyPriorityQueue() 
         {
-            this(null); // Natural ordering if no comparator is provided
+            // null comparator if none is provided, we will then default to using comparable's compareTo method
+            this(null);
+        }
+
+        private int compare(T a, T b)
+        {
+            // if a comparator is provided, use that comparator to compare the provided elements
+            if(comparator != null) return comparator.compare(a, b);
+
+            // if a comparator is not provided, default to comparable's compareTo method. This requires us to cast the elements to the type comparable,
+            // which is an unchecked cast as java cannot verify at runtime that the type being compared implements comparable, so we suppress that warning
+            @SuppressWarnings("unchecked")
+            Comparable<? super T> comparable = (Comparable<? super T>) a;
+            return comparable.compareTo(b);
         }
 
         private int getParent(int index) 
@@ -241,12 +254,37 @@ public class Library
 
         private void heapifyUp(int index)
         {
-
+            int parent = getParent(index);
+            if(index == 0 || compare(heap.get(index), heap.get(parent)) >= 0) return;
+            swap(index, parent);
+            heapifyUp(parent);
         }
 
         private void heapifyDown(int index)
         {
+            int leftChild = getLeftChild(index);
+            int rightChild = getRightChild(index);
+            int heapSize = heap.size();
+            int elementToBeSwapped = index;
 
+            // check left child:
+            if(leftChild < heapSize && compare(heap.get(leftChild), heap.get(elementToBeSwapped)) < 0)
+            {
+                elementToBeSwapped = leftChild;
+            }
+
+            // check right child:
+            if(rightChild < heapSize && compare(heap.get(rightChild), heap.get(elementToBeSwapped)) < 0)
+            {
+                elementToBeSwapped = rightChild;
+            }
+
+            // if one of the children was violates the heap property, elementToBeSwapped and index will not be equal, so we swap and recur
+            if(elementToBeSwapped != index)
+            {
+                swap(index, elementToBeSwapped);
+                heapifyDown(elementToBeSwapped);
+            }
         }
 
         private void swap(int a, int b)
@@ -271,7 +309,18 @@ public class Library
 
         public T poll()
         {
-            return heap.get(0);
+            if(heap.isEmpty()) throw new IllegalStateException("Cannot remove from the heap while it is empty!");
+
+            T returnVal = heap.get(0);
+            T tail = heap.remove(heap.size()-1);
+
+            if(!heap.isEmpty())
+            {
+                heap.set(0, tail);
+                heapifyDown(0);
+            }
+
+            return returnVal;
         }
 
         public int size()
@@ -281,7 +330,7 @@ public class Library
 
         public boolean isEmpty()
         {
-            return heap.size() == 0;
+            return heap.isEmpty();
         }
     }
     public static class MyStack<T>
