@@ -2,11 +2,14 @@
 
 A performance-focused Java implementation of fundamental data structures with comprehensive benchmarking against `java.util` equivalents.
 
-https://github.com/user-attachments/assets/818d2267-0704-4d66-a988-e1fd6d5da8ed
-
 ## Overview
 
 This library provides ground-up implementations of essential data structures, emphasizing both correctness and performance. Each structure includes detailed performance tests that compare custom implementations against Java's standard library, offering insights into algorithmic efficiency and real-world runtime characteristics.
+
+## Testing Results:
+![testingOutput1](https://github.com/user-attachments/assets/79c918a4-0f88-4ea8-b39f-82f66b4549f5)
+![testingOutput2](https://github.com/user-attachments/assets/2c147590-35be-4ed8-858d-fbbde6144945)
+
 
 ## Implemented Data Structures
 
