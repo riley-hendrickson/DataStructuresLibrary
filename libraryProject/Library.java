@@ -1,15 +1,25 @@
 package libraryProject;
 
-import java.util.List;
 import java.util.ArrayList;
 import java.util.Comparator;
+
+/**
+ * Collection of custom data structure implementations.
+ * Includes LinkedList, HashMap, PriorityQueue, and Stack.
+ */
 public class Library
 {
-    // helper class to be used in Linked List implementation:
-    private static class Node <T>
+    // ============================================================
+    // SHARED NODE CLASS
+    // ============================================================
+    
+    /**
+     * Generic node used by LinkedList and Stack implementations.
+     */
+    private static class Node<T>
     {
         private T val;
-        public Node<T> next;
+        private Node<T> next;
 
         public Node(T val)
         {
@@ -17,6 +27,13 @@ public class Library
         }
     }
 
+    // ============================================================
+    // LINKED LIST IMPLEMENTATION
+    // ============================================================
+    
+    /**
+     * Singly-linked list implementation with O(1) append and O(n) search/removal.
+     */
     public static class MyLinkedList<T>
     {
         private Node<T> head;
@@ -38,39 +55,52 @@ public class Library
             return this.length;
         }
 
+        /**
+         * Appends element to the end of the list in O(1) time.
+         */
         public boolean add(T value)
         {
-            Node<T> newNode = new Node<T>(value);
-            // if list is empty initialize new node as head pointer
-            if(this.head == null)
+            Node<T> newNode = new Node<>(value);
+            
+            // If list is empty, initialize as both head and tail
+            if (this.head == null)
             {
                 this.head = newNode;
                 this.tail = newNode;
                 this.length++;
                 return true;
             }
-            // otherwise add to existing list
+            
+            // Otherwise append to end using tail pointer
             this.tail.next = newNode;
             this.tail = newNode;
             this.length++;
             return true;
         }
 
+        /**
+         * Searches for element using linear traversal - O(n) time.
+         */
         public boolean contains(T element)
         {
             Node<T> crawler = this.head;
-            for(int i = 0; i < this.length; i++)
+            for (int i = 0; i < this.length; i++)
             {
-                if(crawler.val == element) return true;
+                if (crawler.val.equals(element)) return true;
                 crawler = crawler.next;
             }
             return false;
         }
 
+        /**
+         * Removes and returns the head element - O(1) time.
+         */
         public T remove()
         {
-            if(this.length == 0) throw new IllegalStateException("Cannot remove while list is empty");
-            if(this.length == 1) this.tail = null;
+            if (this.length == 0) 
+                throw new IllegalStateException("Cannot remove while list is empty");
+            if (this.length == 1) 
+                this.tail = null;
 
             T value = head.val;
             this.head = head.next;
@@ -79,16 +109,25 @@ public class Library
             return value;
         }
 
+        /**
+         * Removes element at specified index - O(n) time.
+         * Special case: removing head (index 0) should use remove() instead.
+         */
         public T remove(int location)
         {
-            if(this.length == 0) throw new IllegalStateException("Cannot remove while list is empty");
-            if(location >= this.length) throw new IndexOutOfBoundsException("Removal index is out of bounds");
+            if (this.length == 0) 
+                throw new IllegalStateException("Cannot remove while list is empty");
+            if (location >= this.length) 
+                throw new IndexOutOfBoundsException("Removal index is out of bounds");
 
+            // Traverse to node before target
             Node<T> crawler = this.head;
-            for(int i = 0; i < location-1; i++)
+            for (int i = 0; i < location - 1; i++)
             {
                 crawler = crawler.next;
             }
+            
+            // Remove target node by updating pointer
             T temp = crawler.next.val;
             crawler.next = crawler.next.next;
             this.length--;
@@ -96,122 +135,166 @@ public class Library
             return temp;
         }
     }
+
+    // ============================================================
+    // HASH MAP IMPLEMENTATION
+    // ============================================================
+    
+    /**
+     * Hash table with separate chaining for collision resolution.
+     * Fixed capacity of 16 buckets.
+     */
     public static class MyHashMap<K, V>
     {
-        // helper class to be used in HashMap
-        private class Entry<EK, EV>
+        /**
+         * Entry class for key-value pairs in the hash table.
+         * Forms a linked list to handle collisions via chaining.
+         */
+        private class Entry
         {
             private final K key;
             private V value;
-            private Entry<K, V> next;
+            private Entry next;
             
             public Entry(K key, V value)
             {
                 this.key = key;
                 this.value = value;
             }
+            
             public K getKey()
             {
                 return this.key;
             }
+            
             public V getValue()
             {
                 return this.value;
             }
+            
             public void setValue(V value)
             {
                 this.value = value;
             }
         }
-        private final int DEFAULT_CAPACITY = 16;
-        private Entry<K, V> entries[];
+        
+        private static final int DEFAULT_CAPACITY = 16;
+        private final Entry[] entries;
 
         @SuppressWarnings("unchecked")
         public MyHashMap()
         {
-            this.entries = new Entry[DEFAULT_CAPACITY];
+            // Generic array creation requires unchecked cast - this is safe
+            this.entries = (Entry[]) new MyHashMap<?, ?>.Entry[DEFAULT_CAPACITY];
         }
 
+        /**
+         * Inserts or updates a key-value pair.
+         * Uses separate chaining to handle hash collisions.
+         */
         public void put(K key, V value)
         {
-            int hashcode = key.hashCode() % DEFAULT_CAPACITY;
-            Entry<K, V> newEntry = entries[hashcode];
+            int hashcode = Math.abs(key.hashCode() % DEFAULT_CAPACITY);
+            Entry current = entries[hashcode];
 
-            if(newEntry == null)
+            // If bucket is empty, create new entry
+            if (current == null)
             {
-                entries[hashcode] = new Entry<K, V>(key, value);
-                newEntry = entries[hashcode];
+                entries[hashcode] = new Entry(key, value);
+                return;
             }
-            else
+            
+            // Otherwise traverse chain to find key or reach end
+            while (current.next != null)
             {
-                while (newEntry.next != null)
+                if (current.key.equals(key))
                 {
-                    if(newEntry.key.equals(key))
-                    {
-                        newEntry.value = value;
-                        return;
-                    }
-                    newEntry = newEntry.next;
-                }
-                if(newEntry.key.equals(key))
-                {
-                    newEntry.value = value;
+                    current.setValue(value);
                     return;
                 }
+                current = current.next;
+            }
+            
+            // Check final node in chain
+            if (current.key.equals(key))
+            {
+                current.value = value;
+                return;
             }
 
-            newEntry.next = new Entry<K, V>(key, value);
+            // Key not found, append to end of chain
+            current.next = new Entry(key, value);
         }
 
+        /**
+         * Retrieves value for given key, or null if not found.
+         */
         public V get(K key)
         {
-            int hashcode = key.hashCode() % DEFAULT_CAPACITY;
-            Entry<K, V> newEntry = entries[hashcode];
+            int hashcode = Math.abs(key.hashCode() % DEFAULT_CAPACITY);
+            Entry current = entries[hashcode];
 
-            if(newEntry == null) return null;
+            if (current == null) return null;
 
-            while(newEntry != null)
+            // Traverse chain looking for matching key
+            while (current != null)
             {
-                if(newEntry.getKey().equals(key)) return newEntry.value;
-                else newEntry = newEntry.next;
+                if (current.getKey().equals(key)) return current.getValue();
+                current = current.next;
             }
+            
             return null;
         }
 
-        public Entry<K, V> remove(K key)
+        /**
+         * Removes and returns entry for given key, or null if not found.
+         */
+        public Entry remove(K key)
         {
-            int hashcode = key.hashCode() % DEFAULT_CAPACITY;
-            Entry<K, V> newEntry = entries[hashcode];
+            int hashcode = Math.abs(key.hashCode() % DEFAULT_CAPACITY);
+            Entry current = entries[hashcode];
 
-            if(newEntry == null) return null;
+            if (current == null) return null;
             
-            if(newEntry.getKey().equals(key))
+            // Special case: key is at head of chain
+            if (current.getKey().equals(key))
             {
-                entries[hashcode] = newEntry.next;
-                newEntry.next = null;
-                return newEntry;
+                entries[hashcode] = current.next;
+                current.next = null;
+                return current;
             }
 
-            Entry<K, V> previous = newEntry;
-            newEntry = newEntry.next;
-            while(newEntry != null)
+            // Traverse chain with previous pointer for removal
+            Entry previous = current;
+            current = current.next;
+            while (current != null)
             {
-                if(newEntry.getKey().equals(key))
+                if (current.getKey().equals(key))
                 {
-                    previous.next = newEntry.next;
-                    newEntry.next = null;
-                    return newEntry;
+                    previous.next = current.next;
+                    current.next = null;
+                    return current;
                 }
                 previous = previous.next;
-                newEntry = newEntry.next;
+                current = current.next;
             }
+            
             return null;
         }
     }
+
+    // ============================================================
+    // PRIORITY QUEUE IMPLEMENTATION
+    // ============================================================
+    
+    /**
+     * Min-heap implementation backed by ArrayList.
+     * Supports custom comparators or uses natural ordering via Comparable.
+     */
     public static class MyPriorityQueue<T>
     {
-        private ArrayList<T> heap;
-        private Comparator<? super T> comparator;
+        private final ArrayList<T> heap;
+        private final Comparator<? super T> comparator;
 
         public MyPriorityQueue(Comparator<? super T> comparator) 
         {
@@ -221,17 +304,22 @@ public class Library
     
         public MyPriorityQueue() 
         {
-            // null comparator if none is provided, we will then default to using comparable's compareTo method
             this(null);
         }
 
+        /**
+         * Compares two elements using comparator if provided,
+         * otherwise uses Comparable interface.
+         */
         private int compare(T a, T b)
         {
-            // if a comparator is provided, use that comparator to compare the provided elements
-            if(comparator != null) return comparator.compare(a, b);
-
-            // if a comparator is not provided, default to comparable's compareTo method. This requires us to cast the elements to the type comparable,
-            // which is an unchecked cast as java cannot verify at runtime that the type being compared implements comparable, so we suppress that warning
+            if (comparator != null)
+            {
+                return comparator.compare(a, b);
+            }
+            
+            // Cast to Comparable - caller responsible for ensuring T implements Comparable
+            // This is the standard approach used by Java's PriorityQueue
             @SuppressWarnings("unchecked")
             Comparable<? super T> comparable = (Comparable<? super T>) a;
             return comparable.compareTo(b);
@@ -252,38 +340,50 @@ public class Library
             return (2 * index) + 2;
         }
 
+        /**
+         * Restores heap property by moving element up the tree.
+         * Called after insertion.
+         */
         private void heapifyUp(int index)
         {
+            // Base case: reached root or heap property satisfied
             int parent = getParent(index);
-            if(index == 0 || compare(heap.get(index), heap.get(parent)) >= 0) return;
+            if (index == 0 || compare(heap.get(index), heap.get(parent)) >= 0)
+            {
+                return;
+            }
+            
             swap(index, parent);
             heapifyUp(parent);
         }
 
+        /**
+         * Restores heap property by moving element down the tree.
+         * Called after removal.
+         */
         private void heapifyDown(int index)
         {
             int leftChild = getLeftChild(index);
             int rightChild = getRightChild(index);
             int heapSize = heap.size();
-            int elementToBeSwapped = index;
+            int smallest = index;
 
-            // check left child:
-            if(leftChild < heapSize && compare(heap.get(leftChild), heap.get(elementToBeSwapped)) < 0)
+            // Find smallest among node and its children
+            if (leftChild < heapSize && compare(heap.get(leftChild), heap.get(smallest)) < 0)
             {
-                elementToBeSwapped = leftChild;
+                smallest = leftChild;
             }
 
-            // check right child:
-            if(rightChild < heapSize && compare(heap.get(rightChild), heap.get(elementToBeSwapped)) < 0)
+            if (rightChild < heapSize && compare(heap.get(rightChild), heap.get(smallest)) < 0)
             {
-                elementToBeSwapped = rightChild;
+                smallest = rightChild;
             }
 
-            // if one of the children was violates the heap property, elementToBeSwapped and index will not be equal, so we swap and recur
-            if(elementToBeSwapped != index)
+            // If heap property violated, swap and continue
+            if (smallest != index)
             {
-                swap(index, elementToBeSwapped);
-                heapifyDown(elementToBeSwapped);
+                swap(index, smallest);
+                heapifyDown(smallest);
             }
         }
 
@@ -294,27 +394,39 @@ public class Library
             heap.set(b, temp);
         }
 
+        /**
+         * Inserts element and restores heap property - O(log n).
+         */
         public void add(T value)
         {
             heap.add(value);
-            heapifyUp(heap.size()-1);
+            heapifyUp(heap.size() - 1);
         }
 
+        /**
+         * Returns minimum element without removing - O(1).
+         */
         public T peek()
         {
-            if(heap.size() == 0) throw new IllegalStateException("Cannot peek while the heap is empty!");
+            if (heap.isEmpty()) 
+                throw new IllegalStateException("Cannot peek while the heap is empty!");
 
             return heap.get(0);
         }
 
+        /**
+         * Removes and returns minimum element - O(log n).
+         */
         public T poll()
         {
-            if(heap.isEmpty()) throw new IllegalStateException("Cannot remove from the heap while it is empty!");
+            if (heap.isEmpty()) 
+                throw new IllegalStateException("Cannot remove from the heap while it is empty!");
 
             T returnVal = heap.get(0);
-            T tail = heap.remove(heap.size()-1);
+            T tail = heap.remove(heap.size() - 1);
 
-            if(!heap.isEmpty())
+            // If heap not empty after removal, restore heap property
+            if (!heap.isEmpty())
             {
                 heap.set(0, tail);
                 heapifyDown(0);
@@ -333,6 +445,15 @@ public class Library
             return heap.isEmpty();
         }
     }
+
+    // ============================================================
+    // STACK IMPLEMENTATION
+    // ============================================================
+    
+    /**
+     * LIFO stack implementation using linked nodes.
+     * All operations are O(1).
+     */
     public static class MyStack<T>
     {
         private Node<T> top;
@@ -343,36 +464,51 @@ public class Library
             this.size = 0;
         }
 
+        /**
+         * Pushes element onto top of stack - O(1).
+         */
         public void push(T value)
         {
-            Node<T> newNode = new Node<T>(value);
-            if(size != 0)
+            Node<T> newNode = new Node<>(value);
+            
+            if (size != 0)
             {
                 newNode.next = this.top;
             }
+            
             this.top = newNode;
             size++;
         }
 
+        /**
+         * Removes and returns top element - O(1).
+         */
         public T pop()
         {
-            if(size == 0) throw new IllegalStateException("Cannot remove from the stack while it is empty!");
+            if (size == 0) 
+                throw new IllegalStateException("Cannot remove from the stack while it is empty!");
 
             T returnVal = this.top.val;
             this.top = this.top.next;
             size--;
+            
             return returnVal;
         }
 
+        /**
+         * Returns top element without removing - O(1).
+         */
         public T peek()
         {
-            if(size == 0) throw new IllegalStateException("Cannot peek while the stack is empty!");
+            if (size == 0) 
+                throw new IllegalStateException("Cannot peek while the stack is empty!");
+                
             return top.val;
         }
 
         public boolean isEmpty()
         {
-            return this.size == 0? true : false; 
+            return this.size == 0;
         }
 
         public int size()
