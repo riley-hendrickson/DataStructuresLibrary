@@ -7,451 +7,387 @@ import java.util.Stack;
 import java.util.PriorityQueue;
 import java.util.Random;
 
-// Testing Plan: Check memory usage before and after runtime of each method, and measure its runtime, take the average of recordings from 3 separate runs
-
+/**
+ * Performance benchmarking suite for custom data structure implementations.
+ * Compares runtime performance against Java's standard library equivalents.
+ */
 public class TestFunctions
 {
     private static final int TEST_FREQUENCY = 5;
     private static final int NUM_OPERATIONS = 1000;
+    private static final Random randomNumberGenerator = new Random();
 
-    private static Random randomNumberGenerator = new Random();
+    /**
+     * Helper method to measure average runtime of an operation across multiple trials.
+     * @param operation The operation to benchmark
+     * @return Average runtime in nanoseconds
+     */
+    private static long measureAverageRuntime(Runnable operation)
+    {
+        long sumOfRuntimes = 0;
+        
+        for (int trial = 0; trial < TEST_FREQUENCY; trial++)
+        {
+            long startTime = System.nanoTime();
+            operation.run();
+            long endTime = System.nanoTime();
+            sumOfRuntimes += (endTime - startTime);
+        }
+        
+        return sumOfRuntimes / TEST_FREQUENCY;
+    }
+
+    /**
+     * Convert nanoseconds to milliseconds with precision.
+     */
+    private static double nanosToMillis(long nanos)
+    {
+        return nanos / 1_000_000.0;
+    }
+
+    /**
+     * Print a formatted performance result.
+     */
+    private static void printResult(String operation, long avgNanos)
+    {
+        System.out.printf("  %-45s %.3f ms%n", operation + ":", nanosToMillis(avgNanos));
+    }
 
     public static void testLinkedList(MyLinkedList<Integer> list)
     {
-        long sumOfRuntimes = 0;
-        long startingTime;
-        long endingTime;
-        long avgOfRuntimes;
-
-        System.out.println("------------------------------------------------------------");
-        System.out.println("Testing Linked List...\n");
+        System.out.println("============================================================");
+        System.out.println("LINKED LIST PERFORMANCE COMPARISON");
+        System.out.println("============================================================\n");
 
         LinkedList<Integer> javaList = new LinkedList<>();
         MyLinkedList<Integer> myList = new MyLinkedList<>();
 
-        // warm up phase before measuring runtime to avoid JVM initialization overhead, and to ensure we don't need to refill lists after testing remove function
-        for(int j = 0; j < TEST_FREQUENCY; j++)
+        // Warm-up phase to avoid JVM initialization overhead
+        for (int j = 0; j < TEST_FREQUENCY; j++)
         {
-            for(int i = 0; i < NUM_OPERATIONS; i++)
+            for (int i = 0; i < NUM_OPERATIONS; i++)
             {
                 javaList.add(i);
                 myList.add(i);
             }
         }
 
-        // measuring runtime for java's linked list operations:
-        System.out.println("Java.util's linked list results:");
-        for(int j = 0; j < TEST_FREQUENCY; j++)
-        {
-            startingTime = System.nanoTime();
-            for(int i = 0; i < NUM_OPERATIONS; i++)
+        System.out.println("Java.util.LinkedList:");
+        
+        // Test add operation
+        long javaAddTime = measureAverageRuntime(() -> {
+            for (int i = 0; i < NUM_OPERATIONS; i++)
             {
                 javaList.add(i);
             }
-            endingTime = System.nanoTime();
-            sumOfRuntimes += endingTime - startingTime;
-        }
-        avgOfRuntimes = sumOfRuntimes / TEST_FREQUENCY;
-        System.out.println("Average runtime of inserting NUM_OPERATIONS times: " + avgOfRuntimes + "ms");
+        });
+        printResult("Add " + NUM_OPERATIONS + " elements", javaAddTime);
 
-        sumOfRuntimes = 0;
-        for(int j = 0; j < TEST_FREQUENCY; j++)
-        {
-            startingTime = System.nanoTime();
-            for(int i = 0; i < NUM_OPERATIONS; i++)
+        // Test contains operation
+        long javaContainsTime = measureAverageRuntime(() -> {
+            for (int i = 0; i < NUM_OPERATIONS; i++)
             {
                 javaList.contains(i);
             }
-            endingTime = System.nanoTime();
-            sumOfRuntimes += endingTime - startingTime;
-        }
-        avgOfRuntimes = sumOfRuntimes / TEST_FREQUENCY;
-        System.out.println("Average runtime of NUM_OPERATIONS lookup operations: " + avgOfRuntimes + "ms");
+        });
+        printResult("Contains lookup " + NUM_OPERATIONS + " times", javaContainsTime);
 
-        sumOfRuntimes = 0;
-        for(int j = 0; j < TEST_FREQUENCY; j++)
-        {
-            startingTime = System.nanoTime();
-            for(int i = 0; i < NUM_OPERATIONS; i++)
+        // Test remove from head operation
+        long javaRemoveTime = measureAverageRuntime(() -> {
+            for (int i = 0; i < NUM_OPERATIONS; i++)
             {
-                javaList.remove(randomNumberGenerator.nextInt(javaList.size()));
+                javaList.removeFirst();
             }
-            endingTime = System.nanoTime();
-            sumOfRuntimes += endingTime - startingTime;
-        }
-        avgOfRuntimes = sumOfRuntimes / TEST_FREQUENCY;
-        System.out.println("Average of deleting at random location NUM_OPERATIONS times: " + avgOfRuntimes + "ms");
+        });
+        printResult("Remove from head " + NUM_OPERATIONS + " times", javaRemoveTime);
 
-        sumOfRuntimes = 0;
-        for(int j = 0; j < TEST_FREQUENCY; j++)
-        {
-            startingTime = System.nanoTime();
-            for(int i = 0; i < NUM_OPERATIONS; i++)
-            {
-                javaList.remove();
-            }
-            endingTime = System.nanoTime();
-            sumOfRuntimes += endingTime - startingTime;
-        }
-        avgOfRuntimes = sumOfRuntimes / TEST_FREQUENCY;
-        System.out.println("Average runtime of deleting NUM_OPERATIONS times: " + avgOfRuntimes + "ms\n");
+        System.out.println("\nCustom MyLinkedList:");
 
-        // measuring runtime for my linked list's operations:
-        System.out.println("My linked list results:");
-        for(int j = 0; j < TEST_FREQUENCY; j++)
-        {
-            startingTime = System.nanoTime();
-            for(int i = 0; i < NUM_OPERATIONS; i++)
+        // Test add operation
+        long myAddTime = measureAverageRuntime(() -> {
+            for (int i = 0; i < NUM_OPERATIONS; i++)
             {
                 myList.add(i);
             }
-            endingTime = System.nanoTime();
-            sumOfRuntimes += endingTime - startingTime;
-        }
-        avgOfRuntimes = sumOfRuntimes / TEST_FREQUENCY;
-        System.out.println("Average runtime of inserting NUM_OPERATIONS times: " + avgOfRuntimes + "ms");
-        
-        sumOfRuntimes = 0;
-        for(int j = 0; j < TEST_FREQUENCY; j++)
-        {
-            startingTime = System.nanoTime();
-            for(int i = 0; i < NUM_OPERATIONS; i++)
+        });
+        printResult("Add " + NUM_OPERATIONS + " elements", myAddTime);
+
+        // Test contains operation
+        long myContainsTime = measureAverageRuntime(() -> {
+            for (int i = 0; i < NUM_OPERATIONS; i++)
             {
                 myList.contains(i);
             }
-            endingTime = System.nanoTime();
-            sumOfRuntimes += endingTime - startingTime;
-        }
-        avgOfRuntimes = sumOfRuntimes / TEST_FREQUENCY;
-        System.out.println("Average runtime of NUM_OPERATIONS lookup operations: " + avgOfRuntimes + "ms");
-        
-        sumOfRuntimes = 0;
-        for(int j = 0; j < TEST_FREQUENCY; j++)
-        {
-            startingTime = System.nanoTime();
-            for(int i = 0; i < NUM_OPERATIONS; i++)
+        });
+        printResult("Contains lookup " + NUM_OPERATIONS + " times", myContainsTime);
+
+        // Test remove at random index
+        long myRemoveRandomTime = measureAverageRuntime(() -> {
+            for (int i = 0; i < NUM_OPERATIONS && myList.size() > 0; i++)
             {
-                myList.remove(randomNumberGenerator.nextInt(myList.size()));
+                int randomIndex = randomNumberGenerator.nextInt(myList.size());
+                myList.remove(randomIndex);
             }
-            endingTime = System.nanoTime();
-            sumOfRuntimes += endingTime - startingTime;
-        }
-        avgOfRuntimes = sumOfRuntimes / TEST_FREQUENCY;
-        System.out.println("Average of deleting at random location NUM_OPERATIONS times: " + avgOfRuntimes + "ms");
-        
-        sumOfRuntimes = 0;
-        for(int j = 0; j < TEST_FREQUENCY; j++)
+        });
+        printResult("Remove at random index " + NUM_OPERATIONS + " times", myRemoveRandomTime);
+
+        // Refill list for next test
+        for (int i = 0; i < NUM_OPERATIONS; i++)
         {
-            startingTime = System.nanoTime();
-            for(int i = 0; i < NUM_OPERATIONS; i++)
+            myList.add(i);
+        }
+
+        // Test remove from head
+        long myRemoveTime = measureAverageRuntime(() -> {
+            for (int i = 0; i < NUM_OPERATIONS && myList.size() > 0; i++)
             {
                 myList.remove();
             }
-            endingTime = System.nanoTime();
-            sumOfRuntimes += endingTime - startingTime;
-        }
-        avgOfRuntimes = sumOfRuntimes / TEST_FREQUENCY;
-        System.out.println("Average runtime of deleting NUM_OPERATIONS times: " + avgOfRuntimes + "ms");
-        System.out.println("------------------------------------------------------------\n");
+        });
+        printResult("Remove from head " + NUM_OPERATIONS + " times", myRemoveTime);
+
+        System.out.println("\n");
     }
 
     public static void testHashMap(MyHashMap<Integer, Integer> map)
     {
-        long sumOfRuntimes = 0;
-        long startingTime;
-        long endingTime;
-        long avgOfRuntimes;
+        System.out.println("============================================================");
+        System.out.println("HASH MAP PERFORMANCE COMPARISON");
+        System.out.println("============================================================\n");
 
-        System.out.println("------------------------------------------------------------");
-        System.out.println("Testing Hash Map...\n");
+        HashMap<Integer, Integer> javaMap = new HashMap<>();
+        MyHashMap<Integer, Integer> myHashMap = new MyHashMap<>();
 
-        HashMap <Integer, Integer> javaMap = new HashMap<Integer, Integer>();
-        MyHashMap<Integer, Integer> myHashMap = new MyHashMap<Integer, Integer>();
-
-        // warm up phase before measuring runtime to avoid JVM initialization overhead, and to ensure we don't need to refill lists after testing remove function
-        for(int j = 0; j < TEST_FREQUENCY; j++)
+        // Warm-up phase
+        for (int j = 0; j < TEST_FREQUENCY; j++)
         {
-            for(int i = 0; i < NUM_OPERATIONS; i++)
+            for (int i = 0; i < NUM_OPERATIONS; i++)
             {
                 javaMap.put(i, i);
                 myHashMap.put(i, i);
             }
-        }        
+        }
 
-        // measuring runtime for java's hash map operations:
-        System.out.println("Java.util's hash map results:");
-        for(int j = 0; j < TEST_FREQUENCY; j++)
-        {
-            startingTime = System.nanoTime();
-            for(int i = 0; i < NUM_OPERATIONS; i++)
+        System.out.println("Java.util.HashMap:");
+
+        // Test put operation
+        long javaPutTime = measureAverageRuntime(() -> {
+            for (int i = 0; i < NUM_OPERATIONS; i++)
             {
                 javaMap.put(i, i);
             }
-            endingTime = System.nanoTime();
-            sumOfRuntimes += endingTime - startingTime;
-        }
-        avgOfRuntimes = sumOfRuntimes / TEST_FREQUENCY;
-        System.out.println("Average runtime of performing put operation NUM_OPERATIONS times: " + avgOfRuntimes + "ms");
-        
-        for(int j = 0; j < TEST_FREQUENCY; j++)
-        {
-            startingTime = System.nanoTime();
-            for(int i = 0; i < NUM_OPERATIONS; i++)
+        });
+        printResult("Put " + NUM_OPERATIONS + " entries", javaPutTime);
+
+        // Test get operation
+        long javaGetTime = measureAverageRuntime(() -> {
+            for (int i = 0; i < NUM_OPERATIONS; i++)
             {
                 javaMap.get(i);
             }
-            endingTime = System.nanoTime();
-            sumOfRuntimes += endingTime - startingTime;
-        }
-        avgOfRuntimes = sumOfRuntimes / TEST_FREQUENCY;
-        System.out.println("Average runtime of performing get operation NUM_OPERATIONS times: " + avgOfRuntimes + "ms");
+        });
+        printResult("Get " + NUM_OPERATIONS + " entries", javaGetTime);
 
-        for(int j = 0; j < TEST_FREQUENCY; j++)
-        {
-            startingTime = System.nanoTime();
-            for(int i = 0; i < NUM_OPERATIONS; i++)
+        // Test remove operation
+        long javaRemoveTime = measureAverageRuntime(() -> {
+            for (int i = 0; i < NUM_OPERATIONS; i++)
             {
                 javaMap.remove(i);
             }
-            endingTime = System.nanoTime();
-            sumOfRuntimes += endingTime - startingTime;
-        }
-        avgOfRuntimes = sumOfRuntimes / TEST_FREQUENCY;
-        System.out.println("Average runtime of performing remove operation NUM_OPERATIONS times: " + avgOfRuntimes + "ms\n");
+        });
+        printResult("Remove " + NUM_OPERATIONS + " entries", javaRemoveTime);
 
-        System.out.println("My hash map results:");
-        for(int j = 0; j < TEST_FREQUENCY; j++)
-        {
-            startingTime = System.nanoTime();
-            for(int i = 0; i < NUM_OPERATIONS; i++)
+        System.out.println("\nCustom MyHashMap:");
+
+        // Test put operation
+        long myPutTime = measureAverageRuntime(() -> {
+            for (int i = 0; i < NUM_OPERATIONS; i++)
             {
                 myHashMap.put(i, i);
             }
-            endingTime = System.nanoTime();
-            sumOfRuntimes += endingTime - startingTime;
-        }
-        avgOfRuntimes = sumOfRuntimes / TEST_FREQUENCY;
-        System.out.println("Average runtime of performing put operation NUM_OPERATIONS times: " + avgOfRuntimes + "ms");
-        
-        for(int j = 0; j < TEST_FREQUENCY; j++)
-        {
-            startingTime = System.nanoTime();
-            for(int i = 0; i < NUM_OPERATIONS; i++)
+        });
+        printResult("Put " + NUM_OPERATIONS + " entries", myPutTime);
+
+        // Test get operation
+        long myGetTime = measureAverageRuntime(() -> {
+            for (int i = 0; i < NUM_OPERATIONS; i++)
             {
                 myHashMap.get(i);
             }
-            endingTime = System.nanoTime();
-            sumOfRuntimes += endingTime - startingTime;
-        }
-        avgOfRuntimes = sumOfRuntimes / TEST_FREQUENCY;
-        System.out.println("Average runtime of performing get operation NUM_OPERATIONS times: " + avgOfRuntimes + "ms");
+        });
+        printResult("Get " + NUM_OPERATIONS + " entries", myGetTime);
 
-        for(int j = 0; j < TEST_FREQUENCY; j++)
-        {
-            startingTime = System.nanoTime();
-            for(int i = 0; i < NUM_OPERATIONS; i++)
+        // Test remove operation
+        long myRemoveTime = measureAverageRuntime(() -> {
+            for (int i = 0; i < NUM_OPERATIONS; i++)
             {
                 myHashMap.remove(i);
             }
-            endingTime = System.nanoTime();
-            sumOfRuntimes += endingTime - startingTime;
-        }
-        avgOfRuntimes = sumOfRuntimes / TEST_FREQUENCY;
-        System.out.println("Average runtime of performing remove operation NUM_OPERATIONS times: " + avgOfRuntimes + "ms\n");
-        System.out.println("------------------------------------------------------------\n");
-    }
+        });
+        printResult("Remove " + NUM_OPERATIONS + " entries", myRemoveTime);
 
+        System.out.println("\n");
+    }
 
     public static void testPriorityQueue(MyPriorityQueue<Integer> heap)
     {
-        long sumOfRuntimes = 0;
-        long startingTime;
-        long endingTime;
-        long avgOfRuntimes;
+        System.out.println("============================================================");
+        System.out.println("PRIORITY QUEUE PERFORMANCE COMPARISON");
+        System.out.println("============================================================\n");
 
-        System.out.println("------------------------------------------------------------");
-        System.out.println("Testing Priority Queue...\n");
+        PriorityQueue<Integer> javaPriorityQueue = new PriorityQueue<>();
+        MyPriorityQueue<Integer> myPriorityQueue = new MyPriorityQueue<>();
 
-        PriorityQueue <Integer> javaPriorityQueue = new PriorityQueue<Integer>();
-        MyPriorityQueue <Integer> myPriorityQueue = new MyPriorityQueue<>();
-
-        // measuring runtime for java's priority queue operations:
-        System.out.println("Java.util's priority queue results:");
-        for(int j = 0; j < TEST_FREQUENCY; j++)
+        // Warm-up phase
+        for (int j = 0; j < TEST_FREQUENCY; j++)
         {
-            startingTime = System.nanoTime();
-            for(int i = 0; i < NUM_OPERATIONS; i++)
+            for (int i = 0; i < NUM_OPERATIONS; i++)
             {
-                // add operation
+                javaPriorityQueue.add(i);
+                myPriorityQueue.add(i);
+            }
+            javaPriorityQueue.clear();
+            // Note: If MyPriorityQueue doesn't have clear(), we'll need to poll all elements
+        }
+
+        System.out.println("Java.util.PriorityQueue:");
+
+        // Test add operation
+        long javaAddTime = measureAverageRuntime(() -> {
+            for (int i = 0; i < NUM_OPERATIONS; i++)
+            {
                 javaPriorityQueue.add(i);
             }
-            endingTime = System.nanoTime();
-            sumOfRuntimes += endingTime - startingTime;
-        }
-        avgOfRuntimes = sumOfRuntimes / TEST_FREQUENCY;
-        System.out.println("Average runtime of performing add operation NUM_OPERATIONS times: " + avgOfRuntimes + "ms");
-        
-        for(int j = 0; j < TEST_FREQUENCY; j++)
-        {
-            startingTime = System.nanoTime();
-            for(int i = 0; i < NUM_OPERATIONS; i++)
+        });
+        printResult("Add " + NUM_OPERATIONS + " elements", javaAddTime);
+
+        // Test peek operation
+        long javaPeekTime = measureAverageRuntime(() -> {
+            for (int i = 0; i < NUM_OPERATIONS; i++)
             {
                 javaPriorityQueue.peek();
             }
-            endingTime = System.nanoTime();
-            sumOfRuntimes += endingTime - startingTime;
-        }
-        avgOfRuntimes = sumOfRuntimes / TEST_FREQUENCY;
-        System.out.println("Average runtime of performing peek operation NUM_OPERATIONS times: " + avgOfRuntimes + "ms");
+        });
+        printResult("Peek " + NUM_OPERATIONS + " times", javaPeekTime);
 
-        for(int j = 0; j < TEST_FREQUENCY; j++)
-        {
-            startingTime = System.nanoTime();
-            for(int i = 0; i < NUM_OPERATIONS; i++)
+        // Test poll operation
+        long javaPollTime = measureAverageRuntime(() -> {
+            for (int i = 0; i < NUM_OPERATIONS; i++)
             {
                 javaPriorityQueue.poll();
             }
-            endingTime = System.nanoTime();
-            sumOfRuntimes += endingTime - startingTime;
-        }
-        avgOfRuntimes = sumOfRuntimes / TEST_FREQUENCY;
-        System.out.println("Average runtime of performing poll operation NUM_OPERATIONS times: " + avgOfRuntimes + "ms\n");
+        });
+        printResult("Poll " + NUM_OPERATIONS + " elements", javaPollTime);
 
-        System.out.println("My priority queue results:");
-        for(int j = 0; j < TEST_FREQUENCY; j++)
-        {
-            startingTime = System.nanoTime();
-            for(int i = 0; i < NUM_OPERATIONS; i++)
+        System.out.println("\nCustom MyPriorityQueue:");
+
+        // Test add operation
+        long myAddTime = measureAverageRuntime(() -> {
+            for (int i = 0; i < NUM_OPERATIONS; i++)
             {
                 myPriorityQueue.add(i);
             }
-            endingTime = System.nanoTime();
-            sumOfRuntimes += endingTime - startingTime;
-        }
-        avgOfRuntimes = sumOfRuntimes / TEST_FREQUENCY;
-        System.out.println("Average runtime of performing add operation NUM_OPERATIONS times: " + avgOfRuntimes + "ms");
-        
-        for(int j = 0; j < TEST_FREQUENCY; j++)
-        {
-            startingTime = System.nanoTime();
-            for(int i = 0; i < NUM_OPERATIONS; i++)
+        });
+        printResult("Add " + NUM_OPERATIONS + " elements", myAddTime);
+
+        // Test peek operation
+        long myPeekTime = measureAverageRuntime(() -> {
+            for (int i = 0; i < NUM_OPERATIONS; i++)
             {
                 myPriorityQueue.peek();
             }
-            endingTime = System.nanoTime();
-            sumOfRuntimes += endingTime - startingTime;
-        }
-        avgOfRuntimes = sumOfRuntimes / TEST_FREQUENCY;
-        System.out.println("Average runtime of performing peek operation NUM_OPERATIONS times: " + avgOfRuntimes + "ms");
+        });
+        printResult("Peek " + NUM_OPERATIONS + " times", myPeekTime);
 
-        for(int j = 0; j < TEST_FREQUENCY; j++)
-        {
-            startingTime = System.nanoTime();
-            for(int i = 0; i < NUM_OPERATIONS; i++)
+        // Test poll operation
+        long myPollTime = measureAverageRuntime(() -> {
+            for (int i = 0; i < NUM_OPERATIONS; i++)
             {
                 myPriorityQueue.poll();
             }
-            endingTime = System.nanoTime();
-            sumOfRuntimes += endingTime - startingTime;
-        }
-        avgOfRuntimes = sumOfRuntimes / TEST_FREQUENCY;
-        System.out.println("Average runtime of performing poll operation NUM_OPERATIONS times: " + avgOfRuntimes + "ms\n");
-        System.out.println("------------------------------------------------------------\n");
+        });
+        printResult("Poll " + NUM_OPERATIONS + " elements", myPollTime);
+
+        System.out.println("\n");
     }
 
     public static void testStack(MyStack<Integer> stack)
     {
-        long sumOfRuntimes = 0;
-        long startingTime;
-        long endingTime;
-        long avgOfRuntimes;
+        System.out.println("============================================================");
+        System.out.println("STACK PERFORMANCE COMPARISON");
+        System.out.println("============================================================\n");
 
-        System.out.println("------------------------------------------------------------");
-        System.out.println("Testing Stack...\n");
+        Stack<Integer> javaStack = new Stack<>();
+        MyStack<Integer> myStack = new MyStack<>();
 
-        Stack <Integer> javaStack = new Stack<>();
-        MyStack <Integer>myStack = new MyStack<>();
-
-        // measuring runtime for java's hash map operations:
-        System.out.println("Java.util's stack results:");
-        for(int j = 0; j < TEST_FREQUENCY; j++)
+        // Warm-up phase
+        for (int j = 0; j < TEST_FREQUENCY; j++)
         {
-            startingTime = System.nanoTime();
-            for(int i = 0; i < NUM_OPERATIONS; i++)
+            for (int i = 0; i < NUM_OPERATIONS; i++)
+            {
+                javaStack.push(i);
+                myStack.push(i);
+            }
+        }
+
+        System.out.println("Java.util.Stack:");
+
+        // Test push operation
+        long javaPushTime = measureAverageRuntime(() -> {
+            for (int i = 0; i < NUM_OPERATIONS; i++)
             {
                 javaStack.push(i);
             }
-            endingTime = System.nanoTime();
-            sumOfRuntimes += endingTime - startingTime;
-        }
-        avgOfRuntimes = sumOfRuntimes / TEST_FREQUENCY;
-        System.out.println("Average runtime of performing push operation NUM_OPERATIONS times: " + avgOfRuntimes + "ms");
-        
-        for(int j = 0; j < TEST_FREQUENCY; j++)
-        {
-            startingTime = System.nanoTime();
-            for(int i = 0; i < NUM_OPERATIONS; i++)
+        });
+        printResult("Push " + NUM_OPERATIONS + " elements", javaPushTime);
+
+        // Test peek operation
+        long javaPeekTime = measureAverageRuntime(() -> {
+            for (int i = 0; i < NUM_OPERATIONS; i++)
             {
                 javaStack.peek();
             }
-            endingTime = System.nanoTime();
-            sumOfRuntimes += endingTime - startingTime;
-        }
-        avgOfRuntimes = sumOfRuntimes / TEST_FREQUENCY;
-        System.out.println("Average runtime of performing peek operation NUM_OPERATIONS times: " + avgOfRuntimes + "ms");
+        });
+        printResult("Peek " + NUM_OPERATIONS + " times", javaPeekTime);
 
-        for(int j = 0; j < TEST_FREQUENCY; j++)
-        {
-            startingTime = System.nanoTime();
-            for(int i = 0; i < NUM_OPERATIONS; i++)
+        // Test pop operation
+        long javaPopTime = measureAverageRuntime(() -> {
+            for (int i = 0; i < NUM_OPERATIONS; i++)
             {
                 javaStack.pop();
             }
-            endingTime = System.nanoTime();
-            sumOfRuntimes += endingTime - startingTime;
-        }
-        avgOfRuntimes = sumOfRuntimes / TEST_FREQUENCY;
-        System.out.println("Average runtime of performing pop operation NUM_OPERATIONS times: " + avgOfRuntimes + "ms\n");
+        });
+        printResult("Pop " + NUM_OPERATIONS + " elements", javaPopTime);
 
-        System.out.println("My stack results:");
-        for(int j = 0; j < TEST_FREQUENCY; j++)
-        {
-            startingTime = System.nanoTime();
-            for(int i = 0; i < NUM_OPERATIONS; i++)
+        System.out.println("\nCustom MyStack:");
+
+        // Test push operation
+        long myPushTime = measureAverageRuntime(() -> {
+            for (int i = 0; i < NUM_OPERATIONS; i++)
             {
                 myStack.push(i);
             }
-            endingTime = System.nanoTime();
-            sumOfRuntimes += endingTime - startingTime;
-        }
-        avgOfRuntimes = sumOfRuntimes / TEST_FREQUENCY;
-        System.out.println("Average runtime of performing push operation NUM_OPERATIONS times: " + avgOfRuntimes + "ms");
-        
-        for(int j = 0; j < TEST_FREQUENCY; j++)
-        {
-            startingTime = System.nanoTime();
-            for(int i = 0; i < NUM_OPERATIONS; i++)
+        });
+        printResult("Push " + NUM_OPERATIONS + " elements", myPushTime);
+
+        // Test peek operation
+        long myPeekTime = measureAverageRuntime(() -> {
+            for (int i = 0; i < NUM_OPERATIONS; i++)
             {
                 myStack.peek();
             }
-            endingTime = System.nanoTime();
-            sumOfRuntimes += endingTime - startingTime;
-        }
-        avgOfRuntimes = sumOfRuntimes / TEST_FREQUENCY;
-        System.out.println("Average runtime of performing peek operation NUM_OPERATIONS times: " + avgOfRuntimes + "ms");
+        });
+        printResult("Peek " + NUM_OPERATIONS + " times", myPeekTime);
 
-        for(int j = 0; j < TEST_FREQUENCY; j++)
-        {
-            startingTime = System.nanoTime();
-            for(int i = 0; i < NUM_OPERATIONS; i++)
+        // Test pop operation
+        long myPopTime = measureAverageRuntime(() -> {
+            for (int i = 0; i < NUM_OPERATIONS; i++)
             {
                 myStack.pop();
             }
-            endingTime = System.nanoTime();
-            sumOfRuntimes += endingTime - startingTime;
-        }
-        avgOfRuntimes = sumOfRuntimes / TEST_FREQUENCY;
-        System.out.println("Average runtime of performing pop operation NUM_OPERATIONS times: " + avgOfRuntimes + "ms\n");
-        System.out.println("------------------------------------------------------------");
+        });
+        printResult("Pop " + NUM_OPERATIONS + " elements", myPopTime);
+
+        System.out.println("\n");
     }
 }
